@@ -196,3 +196,8 @@ Resources:
       - !Ref PublicSubnet2
       SecurityGroups:
         - !GetAtt ELBSecurityGroup.GroupId
+
+Outputs:
+  ALBEndpoint:
+    Value: !GetAtt [ ApplicationLoadBalancer, DNSName ]
+    Description: The connection endpoint of the ALB
