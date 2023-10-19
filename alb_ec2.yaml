@@ -88,8 +88,13 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
 
   #EC2 Instances
+  
   EC2Instance1:
     Type: AWS::EC2::Instance
+    CreationPolicy:
+      ResourceSignal:
+        Count: 1
+        Timeout: PT10M     # 5H10M30S for 5 hours, 10 mins, 20. default is 5M
     Properties:
       ImageId: ami-0fad7378adf284ce0 
       InstanceType: t2.micro
@@ -100,13 +105,19 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           yum update -y
+          yum install aws-cfn-bootstrap 
           yum install -y httpd
           systemctl start httpd
           systemctl enable httpd
           echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
+          /opt/aws/bin/cfn-signal -s true --stack ${AWS::StackName} --resource EC2Instance1 --region ${AWS::Region}
           
   EC2Instance2:
     Type: AWS::EC2::Instance
+    CreationPolicy:
+      ResourceSignal:
+        Count: 1
+        Timeout: PT10M     # 5H10M30S for 5 hours, 10 mins, 20. default is 5M
     Properties:
       ImageId: ami-0fad7378adf284ce0
       InstanceType: t2.micro
@@ -117,10 +128,12 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           yum update -y
+          yum install aws-cfn-bootstrap 
           yum install -y httpd
           systemctl start httpd
           systemctl enable httpd
           echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
+          /opt/aws/bin/cfn-signal -s true --stack ${AWS::StackName} --resource EC2Instance2 --region ${AWS::Region}
 
   # EC2 Security Group
   ELBSecurityGroup:
